@@ -92,8 +92,6 @@ export function Select<T extends string>({
             backgroundColor: theme.bgMuted,
             borderColor: theme.border,
             opacity: pressed ? 0.9 : 1,
-            // @ts-expect-error web cursor
-            cursor: 'pointer',
           },
         ]}
       >
