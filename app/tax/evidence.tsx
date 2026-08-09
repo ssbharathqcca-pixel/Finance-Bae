@@ -11,8 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { Select } from '@/src/components/Select';
-import { Body, Button, Caption, EmptyState, Input, Screen } from '@/src/components/ui';
+import { Body, Button, Caption, Chip, EmptyState, Input, Screen } from '@/src/components/ui';
 import { authorityLabels } from '@/src/data/labels';
 import { useTheme } from '@/src/hooks/useTheme';
 import {
@@ -173,16 +172,17 @@ export default function EvidenceScreen() {
               onChangeText={setAttachmentNote}
             />
 
-            <Select
-              label="Authority"
-              value={authority}
-              options={authorities.map((a) => ({
-                value: a,
-                label: authorityLabels[a],
-              }))}
-              onChange={setAuthority}
-              searchable
-            />
+            <Caption style={{ marginBottom: 6 }}>Authority</Caption>
+            <View style={styles.chips}>
+              {authorities.map((a) => (
+                <Chip
+                  key={a}
+                  label={authorityLabels[a]}
+                  active={authority === a}
+                  onPress={() => setAuthority(a)}
+                />
+              ))}
+            </View>
 
             <Caption style={{ marginBottom: 8 }}>Attachments</Caption>
             <View style={styles.attachRow}>

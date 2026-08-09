@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Select } from '@/src/components/Select';
 import {
   Body,
   Button,
   Caption,
   Card,
+  Chip,
   Input,
   Screen,
   SectionHeader,
@@ -41,12 +41,10 @@ export default function TaxEstimatorScreen() {
   const [region, setRegion] = useState(taxProfile.provinceOrState);
   const [filingStatus, setFilingStatus] = useState<FilingStatus>(taxProfile.filingStatus);
   const [dependents, setDependents] = useState(String(taxProfile.dependents));
-  const [country, setCountry] = useState<CountryCode>(taxProfile.country);
 
   const draft = useMemo(
     () => ({
       ...taxProfile,
-      country,
       annualGrossIncome: parseFloat(gross) || 0,
       otherIncome: parseFloat(other) || 0,
       estimatedWithholding: parseFloat(withholding) || 0,
@@ -54,36 +52,40 @@ export default function TaxEstimatorScreen() {
       filingStatus,
       dependents: Math.max(0, Math.floor(parseFloat(dependents) || 0)),
     }),
-    [taxProfile, country, gross, other, withholding, region, filingStatus, dependents]
+    [taxProfile, gross, other, withholding, region, filingStatus, dependents]
   );
 
   const estimate = estimateTax(draft, deductionsTotal);
-  const regions = country === 'CA' ? caProvinces : usStates;
-  const regionNames = country === 'CA' ? caProvinceNames : usStateNames;
+  const regions = draft.country === 'CA' ? caProvinces : usStates;
+  const regionNames = draft.country === 'CA' ? caProvinceNames : usStateNames;
 
   const regionMeta =
-    country === 'CA' ? getCaRegionModel(draft.provinceOrState) : getUsStateModel(draft.provinceOrState);
+    draft.country === 'CA'
+      ? getCaRegionModel(draft.provinceOrState)
+      : getUsStateModel(draft.provinceOrState);
 
   const filingOptions: FilingStatus[] =
-    country === 'CA'
+    draft.country === 'CA'
       ? ['single', 'married_joint', 'common_law']
       : ['single', 'married_joint', 'married_separate', 'head_of_household'];
 
-  const onCountry = (c: CountryCode) => {
-    const nextRegion = c === 'CA' ? 'ON' : 'CA';
-    setCountry(c);
+  const applyCountry = (country: CountryCode) => {
+    const nextRegion = country === 'CA' ? 'ON' : 'CA';
+    updateTaxProfile({
+      country,
+      provinceOrState: nextRegion,
+      filingStatus: 'single',
+    });
+    updateSettings({
+      preferredCountry: country,
+      currency: country === 'CA' ? 'CAD' : 'USD',
+    });
     setRegion(nextRegion);
     setFilingStatus('single');
-    updateTaxProfile({ country: c, provinceOrState: nextRegion, filingStatus: 'single' });
-    updateSettings({
-      preferredCountry: c,
-      currency: c === 'CA' ? 'CAD' : 'USD',
-    });
   };
 
   const saveProfile = () => {
     updateTaxProfile({
-      country,
       annualGrossIncome: draft.annualGrossIncome,
       otherIncome: draft.otherIncome,
       estimatedWithholding: draft.estimatedWithholding,
@@ -96,45 +98,55 @@ export default function TaxEstimatorScreen() {
   return (
     <Screen padded={false}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Caption>
-          Educational estimates only — not tax advice.
+        <Body muted>
+          Educational estimates for US states/DC and Canadian provinces. Not tax advice.
+        </Body>
+
+        <SectionHeader title="Jurisdiction" />
+        <View style={styles.chips}>
+          <Chip
+            label="United States (IRS)"
+            active={taxProfile.country === 'US'}
+            onPress={() => applyCountry('US')}
+          />
+          <Chip
+            label="Canada (CRA)"
+            active={taxProfile.country === 'CA'}
+            onPress={() => applyCountry('CA')}
+          />
+        </View>
+
+        <SectionHeader title={draft.country === 'CA' ? 'Province / territory' : 'State'} />
+        <Caption style={{ marginBottom: 8 }}>
+          Selected: {regionMeta.name} ({draft.provinceOrState})
+        </Caption>
+        <View style={styles.chips}>
+          {regions.map((r) => (
+            <Chip
+              key={r}
+              label={r}
+              active={region.toUpperCase() === r}
+              onPress={() => setRegion(r)}
+            />
+          ))}
+        </View>
+        <Caption style={{ marginBottom: spacing.md }}>
+          {regionNames[draft.provinceOrState] ?? draft.provinceOrState}
         </Caption>
 
-        <Select
-          label="Country"
-          value={country}
-          options={[
-            { value: 'US', label: 'United States (IRS)' },
-            { value: 'CA', label: 'Canada (CRA)' },
-          ]}
-          onChange={onCountry}
-          searchable={false}
-        />
-        <Select
-          label={country === 'CA' ? 'Province / territory' : 'State'}
-          value={region.toUpperCase()}
-          options={regions.map((r) => ({
-            value: r,
-            label: `${r} — ${regionNames[r] ?? r}`,
-          }))}
-          onChange={setRegion}
-          searchable
-        />
-        <Caption style={{ marginBottom: spacing.sm, marginTop: -4 }}>
-          {regionMeta.name}
-          {'kind' in regionMeta ? ` · ${regionMeta.kind}` : ''}
-          {'note' in regionMeta && regionMeta.note ? ` — ${regionMeta.note}` : ''}
-        </Caption>
-
-        <Select
-          label="Filing status"
-          value={filingStatus}
-          options={filingOptions.map((f) => ({ value: f, label: filingStatusLabels[f] }))}
-          onChange={setFilingStatus}
-          searchable={false}
-        />
+        <SectionHeader title="Filing profile" />
+        <View style={styles.chips}>
+          {filingOptions.map((f) => (
+            <Chip
+              key={f}
+              label={filingStatusLabels[f]}
+              active={filingStatus === f}
+              onPress={() => setFilingStatus(f)}
+            />
+          ))}
+        </View>
         <Input
-          label="Dependents"
+          label="Dependents (for simplified credits)"
           keyboardType="number-pad"
           value={dependents}
           onChangeText={setDependents}
@@ -147,13 +159,13 @@ export default function TaxEstimatorScreen() {
         />
         <Input label="Other income" keyboardType="decimal-pad" value={other} onChangeText={setOther} />
         <Input
-          label="Withholding / instalments"
+          label="Estimated withholding / instalments"
           keyboardType="decimal-pad"
           value={withholding}
           onChangeText={setWithholding}
         />
         <Caption style={{ marginBottom: spacing.md }}>
-          Tracked deductions: {formatMoney(deductionsTotal, currency)}
+          Your tracked deductions: {formatMoney(deductionsTotal, currency)}
         </Caption>
 
         <Button label="Save to profile" onPress={saveProfile} />
@@ -166,39 +178,27 @@ export default function TaxEstimatorScreen() {
           <Text style={[styles.big, { color: theme.text }]}>
             {formatMoney(estimate.totalEstimatedTax, currency)}
           </Text>
-          <Body style={{ marginTop: spacing.sm, fontSize: 13 }}>
+          <Body style={{ marginTop: spacing.sm }}>
             Effective {formatPercent(estimate.effectiveRate)} · Marginal{' '}
             {formatPercent(estimate.marginalRate)}
           </Body>
-          <Caption style={{ marginTop: 6 }}>
+          <Body muted style={{ marginTop: spacing.sm }}>
             After withholding: {formatMoney(estimate.estimatedLiabilityAfterWithholding, currency)}
-          </Caption>
+          </Body>
         </Card>
 
         <SectionHeader title="Breakdown" />
         <Card>
-          <Row label="Gross" value={formatMoney(estimate.grossIncome, currency)} />
-          <Row label="Taxable" value={formatMoney(estimate.taxableIncome, currency)} />
+          <Row label="Gross income" value={formatMoney(estimate.grossIncome, currency)} />
+          <Row label="Taxable income" value={formatMoney(estimate.taxableIncome, currency)} />
           <Row label="Federal (net)" value={formatMoney(estimate.federalTax, currency)} />
           <Row
-            label={country === 'CA' ? 'Provincial (net)' : 'State (net)'}
+            label={draft.country === 'CA' ? 'Provincial (net)' : 'State (net)'}
             value={formatMoney(estimate.regionalTax, currency)}
           />
-          <Row label="Credits" value={formatMoney(estimate.totalCredits, currency)} />
+          <Row label="Credits applied" value={formatMoney(estimate.totalCredits, currency)} />
+          <Caption style={{ marginTop: spacing.md }}>{estimate.disclaimer}</Caption>
         </Card>
-
-        {estimate.creditLines.length > 0 ? (
-          <>
-            <SectionHeader title="Credits" />
-            <Card>
-              {estimate.creditLines.map((c) => (
-                <Row key={c.label} label={c.label} value={formatMoney(c.amount, currency)} />
-              ))}
-            </Card>
-          </>
-        ) : null}
-
-        <Caption style={{ marginTop: spacing.lg }}>{estimate.disclaimer}</Caption>
       </ScrollView>
     </Screen>
   );
@@ -209,7 +209,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.row}>
       <Caption style={{ flex: 1, marginRight: 8 }}>{label}</Caption>
-      <Text style={{ color: theme.text, fontWeight: '600', fontSize: 13 }}>{value}</Text>
+      <Text style={{ color: theme.text, fontWeight: '600' }}>{value}</Text>
     </View>
   );
 }
@@ -219,17 +219,22 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: 48,
   },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: spacing.md,
+  },
   big: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
-    letterSpacing: -0.5,
+    letterSpacing: -0.6,
     marginTop: 4,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(127,127,127,0.25)',
   },

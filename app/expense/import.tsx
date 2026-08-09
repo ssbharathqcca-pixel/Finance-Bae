@@ -15,10 +15,10 @@ import {
   Button,
   Caption,
   Card,
+  Chip,
   Screen,
   SectionHeader,
 } from '@/src/components/ui';
-import { Select } from '@/src/components/Select';
 import { expenseCategoryLabels, paymentMethodLabels } from '@/src/data/labels';
 import {
   analyzeCsv,
@@ -285,19 +285,27 @@ export default function ImportExpensesScreen() {
             ) : null}
 
             {FIELD_ORDER.map((field) => (
-              <Select
-                key={field}
-                label={`${FIELD_LABELS[field]}${field === 'title' || field === 'amount' ? ' *' : ''}`}
-                value={(mapping[field] as string) || ''}
-                options={[
-                  { value: '', label: '— not mapped —' },
-                  ...allowedHeaders.map((h) => ({ value: h, label: h })),
-                ]}
-                onChange={(h) =>
-                  setMapping((m) => ({ ...m, [field]: h ? h : null }))
-                }
-                searchable
-              />
+              <View key={field} style={{ marginBottom: spacing.md }}>
+                <Caption style={{ marginBottom: 6 }}>
+                  {FIELD_LABELS[field]}
+                  {field === 'title' || field === 'amount' ? ' *' : ''}
+                </Caption>
+                <View style={styles.chips}>
+                  <Chip
+                    label="— not mapped —"
+                    active={!mapping[field]}
+                    onPress={() => setMapping((m) => ({ ...m, [field]: null }))}
+                  />
+                  {allowedHeaders.map((h) => (
+                    <Chip
+                      key={h}
+                      label={h}
+                      active={mapping[field] === h}
+                      onPress={() => setMapping((m) => ({ ...m, [field]: h }))}
+                    />
+                  ))}
+                </View>
+              </View>
             ))}
 
             <Button label="Preview sanitized rows" onPress={onBuildPreview} />

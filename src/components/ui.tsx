@@ -12,17 +12,17 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '@/src/hooks/useTheme';
 import { radius, spacing, typography } from '@/src/theme';
 
-/** Safe press: never block on haptics; works on web + native. */
-function press(fn?: () => void) {
+function safePress(fn?: () => void) {
   return () => {
     try {
       fn?.();
     } catch (e) {
-      console.warn('Press handler error', e);
+      console.warn(e);
     }
   };
 }
@@ -136,11 +136,7 @@ export function Card({
   );
   if (!onPress) return content;
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={press(onPress)}
-      style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}
-    >
+    <Pressable accessibilityRole="button" onPress={safePress(onPress)} style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}>
       {content}
     </Pressable>
   );
@@ -167,7 +163,7 @@ export function GadgetCard({
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={press(onPress)}
+      onPress={safePress(onPress)}
       style={({ pressed }) => [
         styles.gadget,
         {
@@ -178,24 +174,16 @@ export function GadgetCard({
         style,
       ]}
     >
-      <View style={styles.gadgetTop}>
-        <View style={[styles.gadgetIcon, { backgroundColor: theme.bgElevated }]}>
-          <Text style={{ fontSize: 20 }}>{emoji}</Text>
-        </View>
-        <View style={[styles.gadgetDot, { backgroundColor: accent }]} />
+      <View style={[styles.gadgetIcon, { backgroundColor: theme.bgElevated }]}>
+        <Text style={{ fontSize: 22 }}>{emoji}</Text>
       </View>
-      <Text
-        style={[typography.bodyBold, { color: theme.text, marginTop: 10, fontSize: 14 }]}
-        numberOfLines={1}
-      >
+      <Text style={[typography.bodyBold, { color: theme.text, marginTop: spacing.sm }]} numberOfLines={1}>
         {title}
       </Text>
-      <Text
-        style={[typography.caption, { color: theme.textSecondary, marginTop: 3, fontSize: 11 }]}
-        numberOfLines={2}
-      >
+      <Text style={[typography.caption, { color: theme.textSecondary, marginTop: 2 }]} numberOfLines={2}>
         {subtitle}
       </Text>
+      <View style={[styles.gadgetDot, { backgroundColor: accent }]} />
     </Pressable>
   );
 }
@@ -231,7 +219,7 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       disabled={disabled || loading}
-      onPress={press(onPress)}
+      onPress={safePress(onPress)}
       style={({ pressed }) => [
         styles.button,
         {
@@ -294,7 +282,8 @@ export function Chip({
   const theme = useTheme();
   return (
     <Pressable
-      onPress={onPress}
+      accessibilityRole="button"
+      onPress={safePress(onPress)}
       style={[
         styles.chip,
         {
@@ -352,7 +341,7 @@ export function SectionHeader({
     <View style={styles.sectionHeader}>
       <Text style={[typography.subtitle, { color: theme.text }]}>{title}</Text>
       {actionLabel ? (
-        <Pressable onPress={onAction}>
+        <Pressable onPress={safePress(onAction)}>
           <Text style={[typography.caption, { color: theme.primary, fontWeight: '700' }]}>
             {actionLabel}
           </Text>
@@ -410,10 +399,7 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-/**
- * Always renders children visibly. Optional soft fade on native only.
- * Never starts at opacity 0 (that made the whole UI look “blank” on web).
- */
+/** Always visible — no opacity animation that can hide the UI. */
 export function FadeIn({ children }: { children: ReactNode; delay?: number }) {
   return <View style={{ width: '100%' }}>{children}</View>;
 }
@@ -433,16 +419,9 @@ const styles = StyleSheet.create({
   gadget: {
     borderRadius: radius.lg,
     borderWidth: 1,
-    padding: 12,
-    minHeight: 120,
-    height: 120,
-    width: '100%',
-    justifyContent: 'flex-start',
-  },
-  gadgetTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: spacing.md,
+    minHeight: 128,
+    flex: 1,
   },
   gadgetIcon: {
     width: 40,
@@ -452,6 +431,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gadgetDot: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
     width: 8,
     height: 8,
     borderRadius: 99,

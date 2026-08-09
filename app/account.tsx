@@ -7,11 +7,11 @@ import {
   Button,
   Caption,
   Card,
+  Chip,
   Input,
   Screen,
   SectionHeader,
 } from '@/src/components/ui';
-import { Select } from '@/src/components/Select';
 import { useTheme } from '@/src/hooks/useTheme';
 import {
   formatInstallmentList,
@@ -223,16 +223,19 @@ export default function AccountScreen() {
           optional and only sends the encrypted blob if you opt in and configure a sync server.
         </Body>
 
-        <Select
-          label="Cloud sync opt-in"
-          value={cloudSyncOptIn ? 'on' : 'off'}
-          options={[
-            { value: 'off', label: 'Off — local only' },
-            { value: 'on', label: 'On — allow encrypted remote push' },
-          ]}
-          onChange={(v) => setCloudSyncOptIn(v === 'on')}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Cloud sync opt-in</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="Off — local only"
+            active={!cloudSyncOptIn}
+            onPress={() => setCloudSyncOptIn(false)}
+          />
+          <Chip
+            label="On — allow encrypted remote push"
+            active={cloudSyncOptIn}
+            onPress={() => setCloudSyncOptIn(true)}
+          />
+        </View>
         <Caption style={{ marginBottom: spacing.sm }}>
           Remote:{' '}
           {remoteReady
@@ -282,50 +285,54 @@ export default function AccountScreen() {
           or email leaves your device.
         </Body>
 
-        <Select
-          label="Reminders"
-          value={reminderPrefs.enabled ? 'on' : 'off'}
-          options={[
-            { value: 'off', label: 'Off' },
-            { value: 'on', label: 'On' },
-          ]}
-          onChange={(v) => updateReminderPrefs({ enabled: v === 'on' })}
-          searchable={false}
-        />
-        <Select
-          label="Country schedule"
-          value={reminderPrefs.country}
-          options={[
-            { value: 'US', label: 'United States' },
-            { value: 'CA', label: 'Canada' },
-          ]}
-          onChange={(country) => updateReminderPrefs({ country: country as 'US' | 'CA' })}
-          searchable={false}
-        />
-        <Select
-          label="Days before due date"
-          value={String(reminderPrefs.daysBefore)}
-          options={[
-            { value: '3', label: '3 days' },
-            { value: '7', label: '7 days' },
-            { value: '14', label: '14 days' },
-            { value: '30', label: '30 days' },
-          ]}
-          onChange={(d) => updateReminderPrefs({ daysBefore: parseInt(d, 10) })}
-          searchable={false}
-        />
-        <Select
-          label="Notification hour"
-          value={String(reminderPrefs.hour)}
-          options={[
-            { value: '8', label: '8:00' },
-            { value: '9', label: '9:00' },
-            { value: '12', label: '12:00' },
-            { value: '18', label: '18:00' },
-          ]}
-          onChange={(h) => updateReminderPrefs({ hour: parseInt(h, 10) })}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Reminders</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="Off"
+            active={!reminderPrefs.enabled}
+            onPress={() => updateReminderPrefs({ enabled: false })}
+          />
+          <Chip
+            label="On"
+            active={reminderPrefs.enabled}
+            onPress={() => updateReminderPrefs({ enabled: true })}
+          />
+        </View>
+        <Caption style={{ marginBottom: 6 }}>Country schedule</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="United States"
+            active={reminderPrefs.country === 'US'}
+            onPress={() => updateReminderPrefs({ country: 'US' })}
+          />
+          <Chip
+            label="Canada"
+            active={reminderPrefs.country === 'CA'}
+            onPress={() => updateReminderPrefs({ country: 'CA' })}
+          />
+        </View>
+        <Caption style={{ marginBottom: 6 }}>Days before due date</Caption>
+        <View style={styles.chips}>
+          {([3, 7, 14, 30] as const).map((d) => (
+            <Chip
+              key={d}
+              label={`${d} days`}
+              active={reminderPrefs.daysBefore === d}
+              onPress={() => updateReminderPrefs({ daysBefore: d })}
+            />
+          ))}
+        </View>
+        <Caption style={{ marginBottom: 6 }}>Notification hour</Caption>
+        <View style={styles.chips}>
+          {([8, 9, 12, 18] as const).map((h) => (
+            <Chip
+              key={h}
+              label={`${h}:00`}
+              active={reminderPrefs.hour === h}
+              onPress={() => updateReminderPrefs({ hour: h })}
+            />
+          ))}
+        </View>
 
         <Card style={{ marginBottom: spacing.md }}>
           <Body bold>Upcoming {reminderPrefs.country} dates</Body>

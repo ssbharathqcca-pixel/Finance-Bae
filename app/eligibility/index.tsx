@@ -18,11 +18,11 @@ import {
   Button,
   Caption,
   Card,
+  Chip,
   Input,
   Screen,
   SectionHeader,
 } from '@/src/components/ui';
-import { Select } from '@/src/components/Select';
 import { runEligibilitySuite } from '@/src/lib/eligibility/engine';
 import { ProductEstimate, ProductKind } from '@/src/lib/eligibility/types';
 import {
@@ -199,16 +199,19 @@ export default function EligibilityScreen() {
           </Caption>
         </Card>
 
-        <Select
-          label="Banking norms"
-          value={country}
-          options={[
-            { value: 'US', label: 'United States norms' },
-            { value: 'CA', label: 'Canada norms' },
-          ]}
-          onChange={setCountry}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Banking norms</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="United States norms"
+            active={country === 'US'}
+            onPress={() => setCountry('US')}
+          />
+          <Chip
+            label="Canada norms"
+            active={country === 'CA'}
+            onPress={() => setCountry('CA')}
+          />
+        </View>
         <Caption style={{ marginBottom: spacing.sm }}>
           Common debt-ratio and credit themes — each bank still decides.
         </Caption>
@@ -258,16 +261,15 @@ export default function EligibilityScreen() {
           value={employmentYears}
           onChangeText={setEmploymentYears}
         />
-        <Select
-          label="Is income fairly steady?"
-          value={incomeStable ? 'yes' : 'no'}
-          options={[
-            { value: 'yes', label: 'Yes, steady' },
-            { value: 'no', label: 'It varies a lot' },
-          ]}
-          onChange={(v) => setIncomeStable(v === 'yes')}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Is income fairly steady?</Caption>
+        <View style={styles.chips}>
+          <Chip label="Yes, steady" active={incomeStable} onPress={() => setIncomeStable(true)} />
+          <Chip
+            label="It varies a lot"
+            active={!incomeStable}
+            onPress={() => setIncomeStable(false)}
+          />
+        </View>
 
         <SnapshotStrip
           income={bundle.moneySnapshot.monthlyIncome}
@@ -383,16 +385,19 @@ export default function EligibilityScreen() {
             value={recentLatePayments}
             onChangeText={setRecentLatePayments}
           />
-          <Select
-            label="Did your income go up recently?"
-            value={incomeIncreasedRecently ? 'yes' : 'no'}
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' },
-            ]}
-            onChange={(v) => setIncomeIncreasedRecently(v === 'yes')}
-            searchable={false}
-          />
+          <Caption style={{ marginBottom: 6 }}>Did your income go up recently?</Caption>
+          <View style={styles.chips}>
+            <Chip
+              label="Yes"
+              active={incomeIncreasedRecently}
+              onPress={() => setIncomeIncreasedRecently(true)}
+            />
+            <Chip
+              label="No"
+              active={!incomeIncreasedRecently}
+              onPress={() => setIncomeIncreasedRecently(false)}
+            />
+          </View>
         </ProductSection>
 
         <SectionHeader title="Compare all four" />

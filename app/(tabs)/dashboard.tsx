@@ -5,12 +5,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BarChart, LineChart, PieChart } from '@/src/components/charts';
-import { Select } from '@/src/components/Select';
 import {
   Body,
   Button,
   Caption,
   Card,
+  Chip,
   FadeIn,
   Input,
   SectionHeader,
@@ -213,32 +213,45 @@ export default function DashboardScreen() {
         </FadeIn>
 
         <SectionHeader title="Charts" />
-        <Select
-          label="Compare"
-          value={compareMode}
-          options={[
-            { value: 'cashflow', label: 'Income vs spend' },
-            { value: 'categories', label: 'Categories' },
-            { value: 'trend', label: '6-month trend' },
-          ]}
-          onChange={(id) => {
-            setCompareMode(id);
-            if (id === 'trend') setChartMode('line');
-            else setChartMode('pie');
-          }}
-          searchable={false}
-        />
-        {compareMode !== 'trend' ? (
-          <Select
-            label="Chart style"
-            value={chartMode === 'line' ? 'pie' : chartMode}
-            options={[
-              { value: 'pie', label: 'Pie chart' },
-              { value: 'bar', label: 'Bar chart' },
-            ]}
-            onChange={(m) => setChartMode(m as ChartMode)}
-            searchable={false}
+        <View style={styles.chips}>
+          <Chip
+            label="Income vs spend"
+            active={compareMode === 'cashflow'}
+            onPress={() => {
+              setCompareMode('cashflow');
+              setChartMode('pie');
+            }}
           />
+          <Chip
+            label="Categories"
+            active={compareMode === 'categories'}
+            onPress={() => {
+              setCompareMode('categories');
+              setChartMode('pie');
+            }}
+          />
+          <Chip
+            label="6-month trend"
+            active={compareMode === 'trend'}
+            onPress={() => {
+              setCompareMode('trend');
+              setChartMode('line');
+            }}
+          />
+        </View>
+        {compareMode !== 'trend' ? (
+          <View style={styles.chips}>
+            <Chip
+              label="Pie chart"
+              active={chartMode === 'pie'}
+              onPress={() => setChartMode('pie')}
+            />
+            <Chip
+              label="Bar chart"
+              active={chartMode === 'bar'}
+              onPress={() => setChartMode('bar')}
+            />
+          </View>
         ) : (
           <Caption style={{ marginBottom: spacing.md }}>
             Trend: income, expenses, and savings over 6 months
@@ -406,6 +419,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   debtHead: { flexDirection: 'row', alignItems: 'center' },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: spacing.sm },
   compareRow: { flexDirection: 'row', gap: 8, marginBottom: spacing.md },
   compareChip: {
     flex: 1,

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { Select } from '@/src/components/Select';
-import { Body, Button, Caption, EmptyState, Input, Screen } from '@/src/components/ui';
+import { Body, Button, Caption, Chip, EmptyState, Input, Screen } from '@/src/components/ui';
 import { useTheme } from '@/src/hooks/useTheme';
 import { formatMoney } from '@/src/lib/format';
 import { useAppStore } from '@/src/store/useAppStore';
@@ -58,13 +57,12 @@ export default function DeductionsScreen() {
             </Body>
             <Input label="Name" placeholder="Charitable donation" value={name} onChangeText={setName} />
             <Input label="Amount" keyboardType="decimal-pad" value={amount} onChangeText={setAmount} />
-            <Select
-              label="Category"
-              value={category}
-              options={categories.map((c) => ({ value: c, label: c }))}
-              onChange={setCategory}
-              searchable
-            />
+            <Caption style={{ marginBottom: 6 }}>Category</Caption>
+            <View style={styles.chips}>
+              {categories.map((c) => (
+                <Chip key={c} label={c} active={category === c} onPress={() => setCategory(c)} />
+              ))}
+            </View>
             <Button label="Add deduction" onPress={save} style={{ marginBottom: spacing.lg }} />
             <Caption style={{ marginBottom: spacing.sm }}>
               {filtered.length} deduction{filtered.length === 1 ? '' : 's'} this year

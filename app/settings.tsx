@@ -1,8 +1,7 @@
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Select } from '@/src/components/Select';
-import { Body, Button, Caption, Input, Screen, SectionHeader } from '@/src/components/ui';
+import { Body, Button, Caption, Chip, Input, Screen, SectionHeader } from '@/src/components/ui';
 import { useAppStore } from '@/src/store/useAppStore';
 import { useAuthStore } from '@/src/store/useAuthStore';
 import { CountryCode } from '@/src/types';
@@ -74,27 +73,36 @@ export default function SettingsScreen() {
         />
 
         <SectionHeader title="Region & look" />
-        <Select
-          label="Country & currency"
-          value={settings.preferredCountry}
-          options={[
-            { value: 'US', label: 'United States · USD' },
-            { value: 'CA', label: 'Canada · CAD' },
-          ]}
-          onChange={setCountry}
-          searchable={false}
-        />
-        <Select
-          label="Appearance"
-          value={settings.darkMode}
-          options={[
-            { value: 'system', label: 'System' },
-            { value: 'light', label: 'Light' },
-            { value: 'dark', label: 'Dark' },
-          ]}
-          onChange={(darkMode) => updateSettings({ darkMode })}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Country & currency</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="United States · USD"
+            active={settings.preferredCountry === 'US'}
+            onPress={() => setCountry('US')}
+          />
+          <Chip
+            label="Canada · CAD"
+            active={settings.preferredCountry === 'CA'}
+            onPress={() => setCountry('CA')}
+          />
+        </View>
+        <Caption style={{ marginBottom: 6 }}>Appearance</Caption>
+        <View style={styles.chips}>
+          {(
+            [
+              { value: 'system' as const, label: 'System' },
+              { value: 'light' as const, label: 'Light' },
+              { value: 'dark' as const, label: 'Dark' },
+            ] as const
+          ).map((o) => (
+            <Chip
+              key={o.value}
+              label={o.label}
+              active={settings.darkMode === o.value}
+              onPress={() => updateSettings({ darkMode: o.value })}
+            />
+          ))}
+        </View>
 
         <SectionHeader title="Tax reminders" />
         <Caption>
@@ -135,6 +143,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: spacing.lg, paddingBottom: 40 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: spacing.md },
   row: { flexDirection: 'row', gap: 10, marginTop: spacing.md },
   half: { flex: 1 },
 });

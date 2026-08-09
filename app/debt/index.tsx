@@ -11,12 +11,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BarChart, PieChart } from '@/src/components/charts';
-import { Select } from '@/src/components/Select';
 import {
   Body,
   Button,
   Caption,
   Card,
+  Chip,
   EmptyState,
   FadeIn,
   Input,
@@ -167,16 +167,10 @@ export default function DebtTrackerScreen() {
             {debts.length > 0 ? (
               <>
                 <SectionHeader title="Breakdown charts" />
-                <Select
-                  label="Chart view"
-                  value={chart}
-                  options={[
-                    { value: 'pie', label: 'By type (pie)' },
-                    { value: 'bar', label: 'Balances (bars)' },
-                  ]}
-                  onChange={setChart}
-                  searchable={false}
-                />
+                <View style={styles.chips}>
+                  <Chip label="By type (pie)" active={chart === 'pie'} onPress={() => setChart('pie')} />
+                  <Chip label="Balances (bars)" active={chart === 'bar'} onPress={() => setChart('bar')} />
+                </View>
                 <Card>
                   {chart === 'pie' ? (
                     <PieChart
@@ -229,16 +223,17 @@ export default function DebtTrackerScreen() {
                   value={lender}
                   onChangeText={setLender}
                 />
-                <Select
-                  label="Debt type"
-                  value={kind}
-                  options={kinds.map((k) => ({
-                    value: k,
-                    label: `${debtKindEmoji[k]} ${debtKindLabels[k]}`,
-                  }))}
-                  onChange={setKind}
-                  searchable
-                />
+                <Caption style={{ marginBottom: 6 }}>Debt type</Caption>
+                <View style={styles.chips}>
+                  {kinds.map((k) => (
+                    <Chip
+                      key={k}
+                      label={`${debtKindEmoji[k]} ${debtKindLabels[k]}`}
+                      active={kind === k}
+                      onPress={() => setKind(k)}
+                    />
+                  ))}
+                </View>
                 <Button label="Save debt" onPress={save} />
               </Card>
             ) : null}

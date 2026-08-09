@@ -15,11 +15,11 @@ import {
   Button,
   Caption,
   Card,
+  Chip,
   Input,
   Screen,
   SectionHeader,
 } from '@/src/components/ui';
-import { Select } from '@/src/components/Select';
 import { splitKindEmoji, splitKindLabels } from '@/src/data/labels';
 import { useTheme } from '@/src/hooks/useTheme';
 import { formatMoney } from '@/src/lib/format';
@@ -274,37 +274,38 @@ export default function SplitDetailScreen() {
           value={amount}
           onChangeText={setAmount}
         />
-        <Select
-          label="Who paid?"
-          value={defaultPayer || ''}
-          options={group.participants.map((p) => ({
-            value: p.id,
-            label: p.isYou ? `${p.name} (you)` : p.name,
-          }))}
-          onChange={setPaidById}
-          searchable={false}
-        />
-        <Select
-          label="Split between"
-          value={shareIds.length === 0 ? 'all' : shareIds[0]}
-          options={[
-            { value: 'all', label: 'Everyone equally' },
-            ...group.participants.map((p) => ({
-              value: p.id,
-              label: shareIds.includes(p.id)
-                ? `✓ ${p.name} (toggle via tip below)`
-                : p.name,
-            })),
-          ]}
-          onChange={(v) => {
-            if (v === 'all') setShareIds([]);
-            else toggleShare(v);
-          }}
-          searchable={false}
-        />
+        <Caption style={{ marginBottom: 6 }}>Who paid?</Caption>
+        <View style={styles.chips}>
+          {group.participants.map((p) => (
+            <Chip
+              key={p.id}
+              label={p.isYou ? `${p.name} (you)` : p.name}
+              active={defaultPayer === p.id}
+              onPress={() => setPaidById(p.id)}
+            />
+          ))}
+        </View>
+        <Caption style={{ marginBottom: 6 }}>Split between</Caption>
+        <View style={styles.chips}>
+          <Chip
+            label="Everyone equally"
+            active={shareIds.length === 0}
+            onPress={() => setShareIds([])}
+          />
+          {group.participants.map((p) => (
+            <Chip
+              key={p.id}
+              label={shareIds.includes(p.id) ? `✓ ${p.name}` : p.name}
+              active={shareIds.includes(p.id)}
+              onPress={() => toggleShare(p.id)}
+            />
+          ))}
+        </View>
         <Caption style={{ marginBottom: spacing.sm }}>
-          Tip: pick “Everyone” or select people one by one from the list (selected show ✓).
-          Current: {shareIds.length ? shareIds.map((id) => nameById(group.participants, id)).join(', ') : 'everyone'}
+          Tip: pick “Everyone” or tap people (selected show ✓). Current:{' '}
+          {shareIds.length
+            ? shareIds.map((pid) => nameById(group.participants, pid)).join(', ')
+            : 'everyone'}
         </Caption>
         <Button label="Add to split" onPress={addItem} />
 
@@ -363,6 +364,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: 48,
   },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: spacing.sm },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

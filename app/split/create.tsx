@@ -1,9 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Select } from '@/src/components/Select';
-import { Button, Caption, Input, Screen } from '@/src/components/ui';
+import { Button, Caption, Chip, Input, Screen } from '@/src/components/ui';
 import { splitKindLabels } from '@/src/data/labels';
 import { useAppStore } from '@/src/store/useAppStore';
 import { SplitEventKind } from '@/src/types';
@@ -21,7 +20,7 @@ export default function CreateSplitScreen() {
   const [kind, setKind] = useState<SplitEventKind>('trip');
   const [friends, setFriends] = useState('Alex, Sam');
   const [notes, setNotes] = useState('');
-  const [budgetId, setBudgetId] = useState<string>('');
+  const [budgetId, setBudgetId] = useState<string | undefined>(undefined);
 
   const save = () => {
     if (!name.trim()) {
@@ -60,13 +59,17 @@ export default function CreateSplitScreen() {
           value={name}
           onChangeText={setName}
         />
-        <Select
-          label="Event type"
-          value={kind}
-          options={kinds.map((k) => ({ value: k, label: splitKindLabels[k] }))}
-          onChange={setKind}
-          searchable
-        />
+        <Caption style={{ marginBottom: 6 }}>Event type</Caption>
+        <View style={styles.chips}>
+          {kinds.map((k) => (
+            <Chip
+              key={k}
+              label={splitKindLabels[k]}
+              active={kind === k}
+              onPress={() => setKind(k)}
+            />
+          ))}
+        </View>
         <Input
           label="Friends (comma-separated)"
           placeholder="Alex, Sam, Jordan"
@@ -84,16 +87,20 @@ export default function CreateSplitScreen() {
           multiline
         />
         {budgets.length > 0 ? (
-          <Select
-            label="Link budget (optional)"
-            value={budgetId}
-            options={[
-              { value: '', label: 'None' },
-              ...budgets.map((b) => ({ value: b.id, label: b.name })),
-            ]}
-            onChange={setBudgetId}
-            searchable
-          />
+          <>
+            <Caption style={{ marginBottom: 6 }}>Link budget (optional)</Caption>
+            <View style={styles.chips}>
+              <Chip label="None" active={!budgetId} onPress={() => setBudgetId(undefined)} />
+              {budgets.map((b) => (
+                <Chip
+                  key={b.id}
+                  label={b.name}
+                  active={budgetId === b.id}
+                  onPress={() => setBudgetId(b.id)}
+                />
+              ))}
+            </View>
+          </>
         ) : null}
 
         <Button label="Create group" onPress={save} />
@@ -110,4 +117,5 @@ export default function CreateSplitScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingBottom: 40 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: spacing.md },
 });

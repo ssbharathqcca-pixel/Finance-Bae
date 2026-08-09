@@ -2,8 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Select } from '@/src/components/Select';
-import { Button, Input, Screen } from '@/src/components/ui';
+import { Button, Chip, Input, Screen } from '@/src/components/ui';
 import { budgetKindLabels } from '@/src/data/labels';
 import { useAppStore } from '@/src/store/useAppStore';
 import { BudgetKind } from '@/src/types';
@@ -48,14 +47,13 @@ export default function CreateBudgetScreen() {
           value={limit}
           onChangeText={setLimit}
         />
-        <Select
-          label="Budget type"
-          value={kind}
-          options={kinds.map((k) => ({ value: k, label: budgetKindLabels[k] }))}
-          onChange={setKind}
-          searchable
-        />
-        <Input label="Notes" placeholder="Optional" value={notes} onChangeText={setNotes} multiline />
+        <Input label="Notes" placeholder="Who's invited, venue, gifts..." value={notes} onChangeText={setNotes} multiline />
+
+        <View style={styles.chips}>
+          {kinds.map((k) => (
+            <Chip key={k} label={budgetKindLabels[k]} active={kind === k} onPress={() => setKind(k)} />
+          ))}
+        </View>
 
         <Button label="Create budget" onPress={save} />
         <Button label="Cancel" variant="ghost" onPress={() => router.back()} style={{ marginTop: spacing.sm }} />
@@ -66,4 +64,5 @@ export default function CreateBudgetScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingBottom: 40 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: spacing.lg },
 });
