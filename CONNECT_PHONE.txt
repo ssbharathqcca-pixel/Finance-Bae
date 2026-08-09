@@ -1,0 +1,11 @@
+﻿PROJECT IS NOW EXPO SDK 54 (matches your Expo Go).
+
+1. FORCE CLOSE Expo Go on both phones (swipe away completely).
+2. Reopen Expo Go.
+3. Enter URL:
+
+exp://f7qts0a-anonymous-8081.exp.direct:80
+
+OR scan the QR in open-on-phone.html
+
+Do NOT reuse an old QR from earlier today (those were SDK 52/57).

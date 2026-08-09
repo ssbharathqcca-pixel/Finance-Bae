@@ -1,0 +1,72 @@
+{
+  "expo": {
+    "name": "GBP",
+    "slug": "gbp-finance",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "gbp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gbp.finance",
+      "infoPlist": {
+        "NSCameraUsageDescription": "GBP uses the camera to photograph IRS and CRA notices and supporting evidence.",
+        "NSPhotoLibraryUsageDescription": "GBP attaches photos of receipts and tax notices to your evidence vault."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1220",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "package": "com.gbp.finance",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow GBP to attach photos of receipts and tax notices to your evidence vault.",
+          "cameraPermission": "Allow GBP to photograph IRS and CRA notices and supporting evidence."
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0B1220"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "productName": "Guided Budget Platform",
+      "markets": [
+        "US",
+        "CA"
+      ],
+      "syncUrl": null
+    }
+  }
+}

@@ -1,0 +1,191 @@
+/**
+ * GBP design system — calm, trust-building finance UI.
+ * Psychology: soft greens (growth/safety), sky blues (trust/clarity),
+ * warm sand/amber (attention without panic), muted coral for debt only.
+ */
+export const palette = {
+  navy950: '#0B1220',
+  navy900: '#111827',
+  navy800: '#1F2937',
+  navy700: '#374151',
+  slate500: '#6B7280',
+  slate400: '#9CA3AF',
+  slate200: '#E5E7EB',
+  slate100: '#F3F4F6',
+  white: '#FFFFFF',
+  cream: '#F7F9F8',
+  /** Growth / savings */
+  mint: '#10B981',
+  mintSoft: '#D1FAE5',
+  mintDark: '#047857',
+  sage: '#6EE7B7',
+  /** Trust / income */
+  teal: '#0D9488',
+  sky: '#38BDF8',
+  skySoft: '#E0F2FE',
+  calmBlue: '#3B82F6',
+  calmBlueSoft: '#DBEAFE',
+  amber: '#F59E0B',
+  amberSoft: '#FEF3C7',
+  sand: '#F5E6D3',
+  rose: '#E11D48',
+  roseSoft: '#FFE4E6',
+  /** Debt attention — warm, not alarming */
+  coral: '#F97316',
+  coralSoft: '#FFEDD5',
+  violet: '#8B5CF6',
+  violetSoft: '#EDE9FE',
+  indigo: '#6366F1',
+  indigoSoft: '#E0E7FF',
+  orange: '#F97316',
+  orangeSoft: '#FFEDD5',
+};
+
+/** Dashboard chart series — high-contrast but soft. */
+export const chartColors = {
+  income: '#0D9488',
+  expenses: '#F59E0B',
+  savings: '#10B981',
+  debt: '#FB7185',
+  categories: [
+    '#0D9488',
+    '#38BDF8',
+    '#A78BFA',
+    '#FBBF24',
+    '#34D399',
+    '#F472B6',
+    '#60A5FA',
+    '#FDBA74',
+    '#2DD4BF',
+    '#C4B5FD',
+    '#FCA5A5',
+    '#86EFAC',
+  ],
+  debtKinds: {
+    home_loan: '#6366F1',
+    capex: '#8B5CF6',
+    credit_card: '#F97316',
+    personal_loan: '#0EA5E9',
+    overdraft: '#EAB308',
+    hand_loan: '#14B8A6',
+    auto_loan: '#64748B',
+    student_loan: '#3B82F6',
+    other: '#94A3B8',
+  } as Record<string, string>,
+};
+
+export const lightTheme = {
+  mode: 'light' as const,
+  bg: palette.cream,
+  bgElevated: palette.white,
+  bgMuted: palette.slate100,
+  text: palette.navy900,
+  textSecondary: palette.slate500,
+  textInverse: palette.white,
+  border: 'rgba(15, 23, 42, 0.08)',
+  borderStrong: 'rgba(15, 23, 42, 0.12)',
+  primary: palette.mintDark,
+  primarySoft: palette.mintSoft,
+  accent: palette.calmBlue,
+  accentSoft: palette.calmBlueSoft,
+  danger: palette.coral,
+  dangerSoft: palette.coralSoft,
+  warning: palette.amber,
+  warningSoft: palette.amberSoft,
+  success: palette.mint,
+  income: palette.teal,
+  expense: palette.amber,
+  savings: palette.mintDark,
+  debt: palette.coral,
+  cardShadow: 'rgba(15, 23, 42, 0.08)',
+  tabBar: 'rgba(255,255,255,0.92)',
+  overlay: 'rgba(15, 23, 42, 0.45)',
+  gadget: {
+    expenses: { bg: '#ECFDF5', accent: palette.mintDark },
+    tax: { bg: '#EEF2FF', accent: palette.indigo },
+    budgets: { bg: '#FFF7ED', accent: palette.orange },
+    pets: { bg: '#FDF2F8', accent: '#DB2777' },
+    home: { bg: '#ECFEFF', accent: palette.teal },
+    trips: { bg: '#EFF6FF', accent: palette.sky },
+    dates: { bg: '#FEF2F2', accent: palette.rose },
+    parties: { bg: '#F5F3FF', accent: palette.violet },
+    calculator: { bg: '#F8FAFC', accent: palette.navy700 },
+    evidence: { bg: '#FEFCE8', accent: '#CA8A04' },
+  },
+};
+
+export const darkTheme = {
+  mode: 'dark' as const,
+  bg: palette.navy950,
+  bgElevated: palette.navy900,
+  bgMuted: palette.navy800,
+  text: palette.slate100,
+  textSecondary: palette.slate400,
+  textInverse: palette.navy950,
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderStrong: 'rgba(255, 255, 255, 0.12)',
+  primary: palette.mint,
+  primarySoft: 'rgba(16, 185, 129, 0.16)',
+  accent: palette.sky,
+  accentSoft: 'rgba(56, 189, 248, 0.16)',
+  danger: palette.coral,
+  dangerSoft: 'rgba(249, 115, 22, 0.16)',
+  warning: palette.amber,
+  warningSoft: 'rgba(245, 158, 11, 0.16)',
+  success: palette.mint,
+  income: palette.teal,
+  expense: palette.amber,
+  savings: palette.sage,
+  debt: '#FB7185',
+  cardShadow: 'rgba(0, 0, 0, 0.35)',
+  tabBar: 'rgba(17, 24, 39, 0.94)',
+  overlay: 'rgba(0, 0, 0, 0.55)',
+  gadget: {
+    expenses: { bg: 'rgba(16, 185, 129, 0.12)', accent: palette.mint },
+    tax: { bg: 'rgba(99, 102, 241, 0.14)', accent: '#A5B4FC' },
+    budgets: { bg: 'rgba(249, 115, 22, 0.12)', accent: palette.orange },
+    pets: { bg: 'rgba(219, 39, 119, 0.12)', accent: '#F472B6' },
+    home: { bg: 'rgba(20, 184, 166, 0.12)', accent: palette.teal },
+    trips: { bg: 'rgba(14, 165, 233, 0.12)', accent: palette.sky },
+    dates: { bg: 'rgba(244, 63, 94, 0.12)', accent: palette.rose },
+    parties: { bg: 'rgba(139, 92, 246, 0.12)', accent: palette.violet },
+    calculator: { bg: 'rgba(148, 163, 184, 0.1)', accent: palette.slate200 },
+    evidence: { bg: 'rgba(202, 138, 4, 0.12)', accent: palette.amber },
+  },
+};
+
+export type AppTheme = typeof lightTheme | typeof darkTheme;
+
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+} as const;
+
+export const radius = {
+  sm: 10,
+  md: 14,
+  lg: 18,
+  xl: 24,
+  full: 999,
+} as const;
+
+export const typography = {
+  hero: { fontSize: 28, fontWeight: '700' as const, letterSpacing: -0.5 },
+  title: { fontSize: 20, fontWeight: '700' as const, letterSpacing: -0.3 },
+  subtitle: { fontSize: 16, fontWeight: '600' as const },
+  body: { fontSize: 15, fontWeight: '400' as const },
+  bodyBold: { fontSize: 15, fontWeight: '600' as const },
+  caption: { fontSize: 13, fontWeight: '500' as const },
+  micro: { fontSize: 11, fontWeight: '600' as const, letterSpacing: 0.3 },
+};
+
+export const motion = {
+  fast: 180,
+  normal: 280,
+  slow: 420,
+};
