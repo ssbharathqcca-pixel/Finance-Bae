@@ -1,11 +1,12 @@
-﻿PROJECT IS NOW EXPO SDK 54 (matches your Expo Go).
+﻿GBP LAN connect (same Wi-Fi â€” no tunnel needed if firewall is open)
 
-1. FORCE CLOSE Expo Go on both phones (swipe away completely).
-2. Reopen Expo Go.
-3. Enter URL:
+1. FORCE CLOSE Expo Go on both phones.
+2. Reopen Expo Go â†’ Enter URL:
 
-exp://f7qts0a-anonymous-8081.exp.direct:80
+exp://192.168.1.228:8081
 
-OR scan the QR in open-on-phone.html
+3. Or open open-on-phone.html on the PC and scan the QR.
 
-Do NOT reuse an old QR from earlier today (those were SDK 52/57).
+Web: http://localhost:8081
+
+If timeout: run fix-lan-firewall.ps1 as Administrator once.

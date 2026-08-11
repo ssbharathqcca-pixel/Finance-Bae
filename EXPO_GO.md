@@ -1,84 +1,72 @@
-# Fix: Expo Go “request timed out” (web works, phone fails)
+# Expo Go on phone (same Wi‑Fi)
 
-This is almost always a **network** problem, not a bug in the app.  
-The browser runs on your PC, so it never has to cross Wi‑Fi. Expo Go on your iPhone **must** reach your PC.
+Web uses `localhost` on your PC. Phones must reach your PC’s **Wi‑Fi IP** (e.g. `192.168.1.228:8081`).
 
-Your PC Wi‑Fi IP (example): `192.168.1.228`
+## Why same Wi‑Fi still fails
 
----
+| Cause | What happens |
+|--------|----------------|
+| Windows Firewall (most common) | Phone packets dropped → Expo Go timeout |
+| Network profile **Public** | Windows blocks inbound more aggressively |
+| Metro advertises `localhost` | QR is wrong for phones |
+| Guest / AP isolation Wi‑Fi | Router blocks phone ↔ PC (tunnel only option) |
+| VPN on phone or PC | Breaks LAN discovery |
 
-## Best fix for you: Tunnel mode
-
-On the PC, **stop** any old Expo window (Ctrl+C), then:
-
-```powershell
-cd C:\Users\pavan\OneDrive\Desktop\GBP
-npm run start:tunnel
-```
-
-Wait until you see a **new QR code** (may take 30–60 seconds the first time).
-
-On iPhone:
-1. Open **Expo Go** (update it from the App Store if needed)
-2. Scan that QR code  
-   or **Enter URL** and paste the `exp://…` / tunnel URL shown in the terminal
-
-Tunnel sends traffic through Expo’s servers, so Windows Firewall and “AP isolation” Wi‑Fi usually stop blocking you.
+**Tunnel is not required** when firewall + LAN IP are correct. Tunnel only works around blocked LAN.
 
 ---
 
-## If you want LAN (faster, same Wi‑Fi only)
+## One-time: open firewall (Administrator)
 
-### 1. Same network
-- iPhone and PC on the **same Wi‑Fi**
-- Avoid guest / “IoT” / work Wi‑Fi that isolates devices
-
-### 2. Open Windows Firewall (one-time, as Administrator)
-
-Open **PowerShell as Administrator** and run:
-
-```powershell
-New-NetFirewallRule -DisplayName "Expo Metro 8081" -Direction Inbound -Protocol TCP -LocalPort 8081 -Action Allow -Profile Private,Public
-New-NetFirewallRule -DisplayName "Expo 19000" -Direction Inbound -Protocol TCP -LocalPort 19000 -Action Allow -Profile Private,Public
-New-NetFirewallRule -DisplayName "Expo 19001" -Direction Inbound -Protocol TCP -LocalPort 19001 -Action Allow -Profile Private,Public
-New-NetFirewallRule -DisplayName "Expo 19002" -Direction Inbound -Protocol TCP -LocalPort 19002 -Action Allow -Profile Private,Public
-```
-
-Or: Windows Security → Firewall → Allow an app → allow **Node.js** for Private networks.
-
-### 3. Force the correct PC IP
+On the PC:
 
 ```powershell
 cd C:\Users\pavan\OneDrive\Desktop\GBP
-$env:REACT_NATIVE_PACKAGER_HOSTNAME = "192.168.1.228"
+npm run fix:firewall
+```
+
+Approve the **UAC** prompt. This allows ports **8081** (and Expo helper ports) inbound.
+
+---
+
+## Every time: start LAN mode
+
+```powershell
+cd C:\Users\pavan\OneDrive\Desktop\GBP
 npm run start:lan
 ```
 
-(Replace the IP if `ipconfig` shows a different Wi‑Fi address.)
+Then on **iPhone / Android Expo Go**:
 
-In Expo Go, you can also open:
+1. Force‑close Expo Go  
+2. **Enter URL** (do not use an old tunnel QR):
 
-`exp://192.168.1.228:8081`
+```text
+exp://192.168.1.228:8081
+```
 
----
+(Use the IP printed by `start-lan.ps1` if yours differs.)
 
-## Quick checklist
+Or open `open-on-phone.html` and scan the QR.
 
-| Check | |
-|--------|--|
-| Web works | App code is fine |
-| Timeout on phone | Phone cannot reach Metro on PC |
-| Use tunnel | `npm run start:tunnel` |
-| Same Wi‑Fi | Required for LAN only |
-| Firewall | Often blocks port 8081 without Admin allow |
-| VPN | Turn off VPN on phone/PC while testing |
+Web still works at: http://localhost:8081
 
 ---
 
-## Scripts in this project
+## If LAN still times out
+
+1. PC and phones on the **same** SSID (not guest/IoT).  
+2. VPN off on all devices.  
+3. Re-run `npm run fix:firewall` and accept UAC.  
+4. Last resort only: `npm run start:tunnel` then scan the new tunnel QR.
+
+---
+
+## Scripts
 
 | Command | Use |
 |---------|-----|
-| `npm run start:tunnel` | **Recommended** when Expo Go times out |
-| `npm run start:lan` | Same Wi‑Fi + firewall fixed |
+| `npm run fix:firewall` | One-time Windows allow rules (Admin) |
+| `npm run start:lan` | Same Wi‑Fi, correct IP + QR |
+| `npm run start:tunnel` | Bypass firewall/router isolation |
 | `npm run web` | Browser only |

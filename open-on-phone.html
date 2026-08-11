@@ -1,16 +1,29 @@
 ﻿<!DOCTYPE html>
-<html><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>
-<title>GBP Expo Go SDK 54</title>
-<style>
-body{font-family:system-ui;max-width:440px;margin:32px auto;padding:16px;text-align:center;background:#0B1220;color:#fff}
-code{display:block;background:#111;color:#6EE7B7;padding:14px;border-radius:12px;word-break:break-all;margin:16px 0}
-a{display:inline-block;background:#059669;color:#fff;padding:16px 22px;border-radius:12px;text-decoration:none;font-weight:700}
-img{background:#fff;padding:10px;border-radius:12px;margin:12px}
-.ok{background:#064E3B;padding:14px;border-radius:12px;margin:12px 0;line-height:1.4}
-</style></head><body>
-<h1>GBP — Expo SDK 54</h1>
-<div class="ok">Matches your Expo Go (SDK 54).<br/>Force-close Expo Go first, then connect.</div>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=exp%3A%2F%2Ff7qts0a-anonymous-8081.exp.direct%3A80" width=280 height=280 />
-<code>exp://f7qts0a-anonymous-8081.exp.direct:80</code>
-<p><a href="exp://f7qts0a-anonymous-8081.exp.direct:80">Open in Expo Go</a></p>
-</body></html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open GBP in Expo Go (LAN)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 440px; margin: 40px auto; padding: 16px; text-align: center; }
+    code { display:block; background:#111; color:#0f0; padding:16px; border-radius:12px; word-break:break-all; margin:16px 0; font-size:16px; }
+    a.btn { display:inline-block; background:#059669; color:#fff; padding:14px 20px; border-radius:12px; text-decoration:none; font-weight:700; margin:6px; }
+    p { color:#444; line-height:1.5; }
+    .warn { background:#FEF3C7; padding:12px; border-radius:10px; text-align:left; font-size:14px; }
+  </style>
+</head>
+<body>
+  <h1>GBP â†’ Expo Go (same Wiâ€‘Fi)</h1>
+  <p>PC and phones must be on the <b>same Wiâ€‘Fi</b> (not guest/IoT).</p>
+  <img alt="QR" width="260" height="260" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=exp%3A%2F%2F192.168.1.228%3A8081" />
+  <code>exp://192.168.1.228:8081</code>
+  <p><a class="btn" href="exp://192.168.1.228:8081">Open in Expo Go</a></p>
+  <div class="warn">
+    <b>Phone times out?</b><br/>
+    1. On PC: rightâ€‘click <code>fix-lan-firewall.ps1</code> â†’ Run with PowerShell â†’ Yes on UAC.<br/>
+    2. Forceâ€‘close Expo Go and enter the URL above again.<br/>
+    3. Turn off VPN on phone/PC.<br/>
+    4. Only if still blocked: use tunnel (<code>npm run start:tunnel</code>).
+  </div>
+</body>
+</html>

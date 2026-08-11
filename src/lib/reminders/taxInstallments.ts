@@ -1,9 +1,9 @@
 /**
  * Tax installment calendars + local notifications (Expo SDK 54 / Expo Go).
+ * expo-notifications is loaded lazily so route preloading never crashes Expo Go.
  */
 
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import { TaxReminderPrefs } from '@/src/types/auth';
 
 export type InstallmentDate = {
@@ -51,9 +51,24 @@ export function reminderFireDate(dueDate: string, daysBefore: number, hour: numb
   return fire;
 }
 
+type NotificationsModule = typeof import('expo-notifications');
+
+let notificationsModule: NotificationsModule | null | undefined;
 let handlerConfigured = false;
 
-function ensureHandler() {
+async function getNotifications(): Promise<NotificationsModule | null> {
+  if (Platform.OS === 'web') return null;
+  if (notificationsModule !== undefined) return notificationsModule;
+  try {
+    notificationsModule = await import('expo-notifications');
+    return notificationsModule;
+  } catch {
+    notificationsModule = null;
+    return null;
+  }
+}
+
+async function ensureHandler(Notifications: NotificationsModule) {
   if (handlerConfigured || Platform.OS === 'web') return;
   try {
     Notifications.setNotificationHandler({
@@ -68,7 +83,7 @@ function ensureHandler() {
     });
     handlerConfigured = true;
   } catch {
-    // ignore
+    // ignore — Expo Go limitations
   }
 }
 
@@ -84,7 +99,9 @@ export async function ensureNotificationPermission(): Promise<boolean> {
     return (await Notification.requestPermission()) === 'granted';
   }
   try {
-    ensureHandler();
+    const Notifications = await getNotifications();
+    if (!Notifications) return false;
+    await ensureHandler(Notifications);
     const current = await Notifications.getPermissionsAsync();
     if (permissionGranted(current as any)) return true;
     const req = await Notifications.requestPermissionsAsync();
@@ -99,6 +116,8 @@ const TAX_REMINDER_PREFIX = 'gbp-tax-';
 export async function cancelTaxReminders(): Promise<void> {
   if (Platform.OS === 'web') return;
   try {
+    const Notifications = await getNotifications();
+    if (!Notifications) return;
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
     await Promise.all(
       scheduled
@@ -132,6 +151,15 @@ export async function scheduleTaxReminders(
     };
   }
 
+  const Notifications = await getNotifications();
+  if (!Notifications) {
+    return {
+      scheduled: 0,
+      skipped: dates.length,
+      message: 'Local notifications unavailable in this environment.',
+    };
+  }
+
   await cancelTaxReminders();
   let scheduled = 0;
   let skipped = 0;
@@ -151,7 +179,7 @@ export async function scheduleTaxReminders(
           data: { type: 'tax_installment', dueDate: d.dueDate, country: d.country },
           sound: true,
         },
-        trigger: { date: fire } as Notifications.NotificationTriggerInput,
+        trigger: { date: fire } as any,
       });
       scheduled++;
     }
